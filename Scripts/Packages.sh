@@ -92,7 +92,7 @@ UPDATE_PACKAGE "theme-fluent" "LazuliKao/luci-theme-fluent" "main"
 
 
 # 科学上网
-UPDATE_PACKAGE "momo" "nikkinikki-org/OpenWrt-momo" "main"
+UPDATE_PACKAGE "daede" "kenzok8/openwrt-daede" "main"
 UPDATE_PACKAGE "nikki" "nikkinikki-org/OpenWrt-nikki" "main"
 UPDATE_PACKAGE "openclash" "vernesong/OpenClash" "dev" "pkg"
 UPDATE_PACKAGE "passwall" "Openwrt-Passwall/openwrt-passwall" "main" "pkg"
