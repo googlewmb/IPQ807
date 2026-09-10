@@ -81,6 +81,89 @@ UPDATE_PACKAGE "timecontrol" "sirpdboy/luci-app-timecontrol" "main"
 UPDATE_PACKAGE "viking" "VIKINGYFY/packages" "main" "" "axonhub gecoosac sing-box luci-app-homeproxy luci-app-timewol luci-app-wolplus luci-app-wolultra"
 UPDATE_PACKAGE "vnt" "lmq8267/luci-app-vnt" "main"
 
+# kenzok8/openwrt-daede
+# 一次克隆仓库并提取 dae、daed、luci-app-daede
+DAEDE_REPO="kenzok8/openwrt-daede"
+DAEDE_BRANCH="main"
+DAEDE_DIR="openwrt-daede"
+
+echo " "
+echo "========================================"
+echo "Install kenzok8/openwrt-daede"
+echo "========================================"
+
+# 删除 feeds 中可能存在的同名旧插件
+for NAME in dae daed luci-app-daede; do
+	echo "Search directory: $NAME"
+
+	FOUND_DIRS=$(find ../feeds/luci/ ../feeds/packages/ \
+		-maxdepth 3 \
+		-type d \
+		-iname "*$NAME*" \
+		2>/dev/null)
+
+	if [ -n "$FOUND_DIRS" ]; then
+		while read -r DIR; do
+			[ -n "$DIR" ] || continue
+			rm -rf "$DIR"
+			echo "Delete directory: $DIR"
+		done <<< "$FOUND_DIRS"
+	else
+		echo "Not fonud directory: $NAME"
+	fi
+
+	# 删除当前目录可能存在的旧版本
+	if [ -d "./$NAME" ]; then
+		rm -rf "./$NAME"
+		echo "Delete directory: ./$NAME"
+	fi
+done
+
+# 删除残留临时目录
+rm -rf "./$DAEDE_DIR"
+
+# 克隆 openwrt-daede
+git clone --depth=1 --single-branch \
+	--branch "$DAEDE_BRANCH" \
+	"https://github.com/$DAEDE_REPO.git" \
+	"$DAEDE_DIR"
+
+if [ ! -d "./$DAEDE_DIR" ]; then
+	echo "ERROR: Failed to clone $DAEDE_REPO"
+	exit 1
+fi
+
+# 提取 dae
+if [ -d "./$DAEDE_DIR/dae" ]; then
+	cp -rf "./$DAEDE_DIR/dae" "./"
+	echo "Added: dae"
+else
+	echo "WARNING: dae not found!"
+fi
+
+# 提取 daed
+if [ -d "./$DAEDE_DIR/daed" ]; then
+	cp -rf "./$DAEDE_DIR/daed" "./"
+	echo "Added: daed"
+else
+	echo "WARNING: daed not found!"
+fi
+
+# 提取 luci-app-daede
+if [ -d "./$DAEDE_DIR/luci-app-daede" ]; then
+	cp -rf "./$DAEDE_DIR/luci-app-daede" "./"
+	echo "Added: luci-app-daede"
+else
+	echo "WARNING: luci-app-daede not found!"
+fi
+
+# 删除临时仓库
+rm -rf "./$DAEDE_DIR"
+
+echo "========================================"
+echo "openwrt-daede installation completed"
+echo "========================================"
+
 #更新软件包版本
 UPDATE_VERSION() {
 	local PKG_NAME=$1
