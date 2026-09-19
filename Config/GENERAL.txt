@@ -14,7 +14,8 @@ CONFIG_PACKAGE_luci-app-cpufreq=y
 # CONFIG_PACKAGE_luci-theme-aurora is not set
 CONFIG_PACKAGE_luci-app-smartdns=y
 
-
+CONFIG_PACKAGE_stuntman-client=y
+CONFIG_PACKAGE_luci-app-natmapt=y
 
 CONFIG_PACKAGE_bpf-headers=n
 #增加插件
