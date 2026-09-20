@@ -69,6 +69,10 @@ UPDATE_PACKAGE "vnt" "lmq8267/luci-app-vnt" "main"
 
 UPDATE_PACKAGE "diskman" "sbwml/luci-app-diskman" "main"
 UPDATE_PACKAGE "mosdns" "sbwml/luci-app-mosdns" "v5" "" "v2dat"
+
+# 修复 luci-app-mosdns 与 mosdns 的 /etc/init.d/mosdns 文件冲突
+find ./package/luci-app-mosdns -type f -name "Makefile" -exec sed -i '/\/etc\/init\.d\/mosdns/d' {} +
+
 UPDATE_PACKAGE "openlist2" "sbwml/luci-app-openlist2" "main"
 UPDATE_PACKAGE "qbittorrent" "sbwml/luci-app-qbittorrent" "master" "" "qt6base qt6tools rblibtorrent"
 UPDATE_PACKAGE "quickfile" "sbwml/luci-app-quickfile" "main"
@@ -109,16 +113,16 @@ UPDATE_VERSION() {
 		local OLD_FILE=$(grep -Po "PKG_SOURCE:=\K.*" "$PKG_FILE")
 		local OLD_HASH=$(grep -Po "PKG_HASH:=\K.*" "$PKG_FILE")
 
-		local PKG_URL=$([[ "$OLD_URL" == *"releases"* ]] && echo "${OLD_URL%/}/$OLD_FILE" || echo "${OLD_URL%/}")
+		local PKG_URL=$([[ "\( OLD_URL" == *"releases"* ]] && echo " \){OLD_URL%/}/\( OLD_FILE" || echo " \){OLD_URL%/}")
 
-		local NEW_VER=$(echo $PKG_TAG | sed -E 's/[^0-9]+/\./g; s/^\.|\.$//g')
+		local NEW_VER=$(echo \( PKG_TAG | sed -E 's/[^0-9]+/\./g; s/^\.|\. \)//g')
 		local NEW_URL=$(echo $PKG_URL | sed "s/\$(PKG_VERSION)/$NEW_VER/g; s/\$(PKG_NAME)/$PKG_NAME/g")
 		local NEW_HASH=$(curl -sL "$NEW_URL" | sha256sum | cut -d ' ' -f 1)
 
 		echo "old version: $OLD_VER $OLD_HASH"
 		echo "new version: $NEW_VER $NEW_HASH"
 
-		if [[ "$NEW_VER" =~ ^[0-9].* ]] && dpkg --compare-versions "$OLD_VER" lt "$NEW_VER"; then
+		if [[ "$NEW_VER" =\~ ^[0-9].* ]] && dpkg --compare-versions "$OLD_VER" lt "$NEW_VER"; then
 			sed -i "s/PKG_VERSION:=.*/PKG_VERSION:=$NEW_VER/g" "$PKG_FILE"
 			sed -i "s/PKG_HASH:=.*/PKG_HASH:=$NEW_HASH/g" "$PKG_FILE"
 			echo "$PKG_FILE version has been updated!"
@@ -128,8 +132,8 @@ UPDATE_VERSION() {
 	done
 }
 
-#UPDATE_VERSION "软件包名" "测试版，true，可选，默认为否"
-#UPDATE_VERSION "sing-box"
+# UPDATE_VERSION "软件包名" "测试版，true，可选，默认为否"
+# UPDATE_VERSION "sing-box"
 
 #引入私有扩展脚本
 if [ -f "$GITHUB_WORKSPACE/Scripts/PRIVATE.sh" ]; then
